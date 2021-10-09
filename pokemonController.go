@@ -25,7 +25,7 @@ type LanguageResource struct {
 	Name string
 }
 
-func getPokemonSpeciesData(appCtx *AppCtx, pokemonName string) (*PokemonSpecies, error) {
+func getPokemonSpeciesData(appCtx AppCtx, pokemonName string) (*PokemonSpecies, error) {
 	resp, err := appCtx.client.R().SetResult(&PokemonSpecies{}).Get("https://pokeapi.co/api/v2/pokemon-species" + "/" + pokemonName)
 	if err != nil {
 		return nil, err

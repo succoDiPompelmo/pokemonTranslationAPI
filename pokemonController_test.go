@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
-	appCtx := &AppCtx{
+	appCtx := AppCtx{
 		client: resty.New(),
 	}
 	pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, "mewtwo")
@@ -32,7 +32,7 @@ func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
 }
 
 func TestGetPokemonSpeciesDataInvalidPokemon(t *testing.T) {
-	appCtx := &AppCtx{
+	appCtx := AppCtx{
 		client: resty.New(),
 	}
 	pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, "paolo")
