@@ -55,6 +55,15 @@ func TestPokemonBasicRoute(t *testing.T) {
 				Habitat: "cave",
 			},
 		}},
+		"GET /pokemon with non-existing pokemon": {input: "zxcvbnm", want: wantResponse{
+			StatusCode: 404,
+			Pokemon: PokemonResponse{
+				Name: "",
+				Description: "",
+				Is_legendary: false,
+				Habitat: "",
+			},
+		}},
 		"GET /pokemon with empty pokemon name parameter": {input: "", want: wantResponse{
 			StatusCode: 404,
 			Pokemon: PokemonResponse{
@@ -82,7 +91,7 @@ func TestPokemonBasicRoute(t *testing.T) {
 func checkResponse(t *testing.T, resp *http.Response, wantResp wantResponse) {
 
 	if resp.StatusCode != wantResp.StatusCode {
-		t.Fatalf("Expected status code %d but found %d", resp.StatusCode, wantResp.StatusCode)
+		t.Fatalf("Expected status code %d but found %d", wantResp.StatusCode, resp.StatusCode)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
