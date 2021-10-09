@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 type PokemonResponse struct {
@@ -68,7 +69,7 @@ func TestPokemonBasicRoute(t *testing.T) {
 	for name, tc := range tests {
         t.Run(name, func(t *testing.T) {
 			req := httptest.NewRequest("GET", "/pokemon/" + tc.input, nil)
-			resp, err := appCtx.app.Test(req, 5)
+			resp, err := appCtx.app.Test(req, 60000) // Set Timeout
 
 			if err != nil {
 				t.Fatalf("Error executing the request: %s", err.Error())
@@ -92,7 +93,10 @@ func checkResponse(t *testing.T, resp *http.Response, wantResp wantResponse) {
 	var gotPokemon PokemonResponse
 	json.Unmarshal(body, &gotPokemon)
 
-	diff := cmp.Diff(wantResp.Pokemon, gotPokemon)
+	opts := []cmp.Option{
+		cmpopts.IgnoreFields(PokemonResponse{}, "Description"),
+	}
+	diff := cmp.Diff(wantResp.Pokemon, gotPokemon, opts...)
 	if diff != "" {
 		t.Fatalf(diff)
 	}
