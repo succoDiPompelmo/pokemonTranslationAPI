@@ -48,13 +48,6 @@ func TestGetTranslationURL(t *testing.T) {
     }
 }
 
-// {
-//     "error": {
-//         "code": 429,
-//         "message": "Too Many Requests: Rate limit of 5 requests per hour exceeded. Please wait for 59 minutes and 16 seconds."
-//     }
-// }
-
 func TestGetTranslatedDescription(t *testing.T) {
 	
 	restyClient := resty.New()
@@ -117,5 +110,4 @@ func TestGetTranslatedDescription(t *testing.T) {
 			}
         })
     }
-
 }

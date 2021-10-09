@@ -75,9 +75,9 @@ func TestPokemonSpeciesIsLegendary(t *testing.T) {
         input *PokemonSpecies
         want  bool
     }{
-        "Standard Habitat Name": {input: &PokemonSpecies{Is_legendary: true}, want: true},
-        "Empty Habitat Name": {input: &PokemonSpecies{Is_legendary: false}, want: false},
-        "No Habitat Resource": {input: &PokemonSpecies{}, want: false},
+        "Legendary Pokemon": {input: &PokemonSpecies{Is_legendary: true}, want: true},
+        "Non Legendary Pokemon": {input: &PokemonSpecies{Is_legendary: false}, want: false},
+        "Default Pokemon": {input: &PokemonSpecies{}, want: false},
     }
 
 	for name, tc := range tests {
