@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -30,8 +29,8 @@ func getPokemonSpeciesData(appCtx AppCtx, pokemonName string) (*PokemonSpecies, 
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode() != 200 {
-		return nil, fmt.Errorf("The Poke API Request returned a status code %d", resp.StatusCode())
+	if resp.StatusCode() > 399 {
+		return nil, &RequestError{statusCode: resp.StatusCode(), err: err,}
 	}
     return resp.Result().(*PokemonSpecies), err
 }

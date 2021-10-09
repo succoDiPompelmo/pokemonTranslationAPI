@@ -11,7 +11,12 @@ func pokemonRoutes(appCtx AppCtx) {
 		pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, pokemonName)
 
 		if err != nil {
-			return fiber.ErrInternalServerError
+			requestError, ok := err.(*RequestError)
+			if ok && requestError.getErrorSatusCode() == 404{
+				return fiber.ErrNotFound
+			} else {
+				return fiber.ErrInternalServerError
+			}
 		}
 
 		return c.JSON(fiber.Map{
