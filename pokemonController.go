@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 type PokemonSpecies struct {
@@ -36,13 +37,20 @@ func getPokemonSpeciesData(appCtx *AppCtx, pokemonName string) (*PokemonSpecies,
 }
 
 func (pokemonSpecies PokemonSpecies) getDescription() string {
-	return ""
+	description := ""
+	for _, flavorText := range pokemonSpecies.Flavor_text_entries {
+		if flavorText.Language.Name == "en" {
+			description = strings.ReplaceAll(strings.ReplaceAll(flavorText.Flavor_text, "\n", " "), "\f", " ")
+			return description
+		}
+	}
+	return description
 }
 
 func (pokemonSpecies PokemonSpecies) getHabitat() string {
-	return ""
+	return pokemonSpecies.Habitat.Name
 }
 
 func (pokemonSpecies PokemonSpecies) isLegendary() bool {
-	return false
+	return pokemonSpecies.Is_legendary
 }
