@@ -2,52 +2,118 @@ package main
 
 import (
 	"testing"
+	"github.com/jarcoal/httpmock"
 	"github.com/go-resty/resty/v2"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
+	
+	restyClient := resty.New()
 	appCtx := AppCtx{
-		client: resty.New(),
-	}
-	pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, "mewtwo")
-	if err != nil {
-		t.Errorf("Expected no Errors but found: %s", err.Error())
+		client: restyClient,
+		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
 	}
 
-	if pokemonSpeciesData == nil {
-		t.Fatalf("Expected pokemon data but none found") 
+	httpmock.ActivateNonDefault(restyClient.GetClient())
+  	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder(
+		"GET", 
+		"https://pokeapi.co/api/v2/pokemon-species/mewtwo", 
+		legendaryPokemonResponder,
+	)
+
+	httpmock.RegisterResponder(
+		"GET", 
+		"https://pokeapi.co/api/v2/pokemon-species/diglett", 
+		cavePokemonResponder,
+	)
+
+	tests := map[string]struct {
+        input string
+        want PokemonSpecies
+    }{
+        "Get pokemon species data for legendary pokemon": {input: "mewtwo", want: PokemonSpecies{
+			Name: "mewtwo",
+			Flavor_text_entries: []FlavorTextEntry{
+				FlavorTextEntry{Flavor_text: "How are you doing young man", Language: LanguageResource{Name: "en"}},
+			},
+			Is_legendary: true,
+			Habitat: HabitatResource{Name: "rare"},
+		}},
+		"Get pokemon species data for non-legendary pokemon": {input: "diglett", want: PokemonSpecies{
+			Name: "diglett",
+			Flavor_text_entries: []FlavorTextEntry{
+				FlavorTextEntry{Flavor_text: "How are you doing young man", Language: LanguageResource{Name: "en"}},
+			},
+			Is_legendary: false,
+			Habitat: HabitatResource{Name: "cave"},
+		}},
 	}
 
-	if pokemonSpeciesData.Name != "mewtwo" {
-		t.Errorf("Expected name mewtwo but found: %s", pokemonSpeciesData.Name) 
-	}
-
-	if pokemonSpeciesData.Habitat.Name != "rare" {
-		t.Errorf("Mewtwo habitat expected to be rare, found: %s", pokemonSpeciesData.Habitat.Name) 
-	}
-
-	if !pokemonSpeciesData.Is_legendary {
-		t.Errorf("Mewtwo found to be non legendary, expected legendary") 
-	}
+	for name, tc := range tests {
+        t.Run(name, func(t *testing.T) {
+			got, err := getPokemonSpeciesData(appCtx, tc.input)
+			if err != nil {
+				t.Fatalf("Error executing the request: %s", err.Error())
+			}
+			diff := cmp.Diff(tc.want, *got)
+			if diff != "" {
+				t.Fatalf(diff)
+			}
+        })
+    }
 }
 
 func TestGetPokemonSpeciesDataInvalidPokemon(t *testing.T) {
+	restyClient := resty.New()
 	appCtx := AppCtx{
-		client: resty.New(),
-	}
-	pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, "paolo")
-
-	if pokemonSpeciesData != nil {
-		t.Errorf("Expected no data to be returned with invalid pokemon name")
+		client: restyClient,
+		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
 	}
 
-	if err == nil {
-		t.Errorf("Expected Errors with invalid pokemon name but none found")
+	httpmock.ActivateNonDefault(restyClient.GetClient())
+  	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder(
+		"GET", 
+		"https://pokeapi.co/api/v2/pokemon-species/zxcvb", 
+		invalidPokemonResponder,
+	)
+
+	httpmock.RegisterResponder(
+		"GET", 
+		"https://pokeapi.co/api/v2/pokemon-species/internalServerError", 
+		internalServerError,
+	)
+
+	tests := map[string]struct {
+        input string
+        want *RequestError
+    }{
+        "Get pokemon species data for invalid pokemon": {input: "zxcvb", want: &RequestError{
+			Err: nil,
+			StatusCode: 404,
+		}},
+		"Get pokemon species data with internal server error": {input: "internalServerError", want: &RequestError{
+			Err: nil,
+			StatusCode: 500,
+		}},
 	}
-}
 
-func TestGetPokemonSpeciesDataConnectionError(t *testing.T) {
-
+	for name, tc := range tests {
+        t.Run(name, func(t *testing.T) {
+			got, err := getPokemonSpeciesData(appCtx, tc.input)
+			if got != nil {
+				t.Fatalf("Expected error but got pokemon data")
+			}
+			diff := cmp.Diff(tc.want, err)
+			if diff != "" {
+				t.Fatalf(diff)
+			}
+        })
+    }
 }
 
 func TestPokemonSpeciesGetHabitat(t *testing.T) {

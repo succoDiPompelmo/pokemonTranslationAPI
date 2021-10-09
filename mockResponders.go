@@ -17,8 +17,38 @@ func shakespeareResponder(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-func emptyResponder(req *http.Request) (*http.Response, error) {
+func emptyTranslationResponder(req *http.Request) (*http.Response, error) {
 	resp := httpmock.NewStringResponse(429, `{"error":{"code": 429, "message": "Too Many Requests: Rate limit of 5 requests per hour exceeded. Please wait for 59 minutes and 58 seconds."}}`)
 	resp.Header.Add("Content-Type", "application/json")
 	return resp, nil
 }
+
+func legendaryPokemonResponder(req *http.Request) (*http.Response, error) {
+	resp := httpmock.NewStringResponse(200, legendaryPokemonData)
+	resp.Header.Add("Content-Type", "application/json")
+	return resp, nil
+}
+
+func cavePokemonResponder(req *http.Request) (*http.Response, error) {
+	resp := httpmock.NewStringResponse(200, cavePokemonData)
+	resp.Header.Add("Content-Type", "application/json")
+	return resp, nil
+}
+
+func invalidPokemonResponder(req *http.Request) (*http.Response, error) {
+	resp := httpmock.NewStringResponse(404, "Not Found")
+	resp.Header.Add("Content-Type", "application/json")
+	return resp, nil
+}
+
+func internalServerError(req *http.Request) (*http.Response, error) {
+	resp := httpmock.NewStringResponse(500, "")
+	resp.Header.Add("Content-Type", "application/json")
+	return resp, nil
+}
+
+// func f(req *http.Request) (*http.Response, error) {
+// 	resp := httpmock.NewStringResponse(429, `{"error":{"code": 429, "message": "Too Many Requests: Rate limit of 5 requests per hour exceeded. Please wait for 59 minutes and 58 seconds."}}`)
+// 	resp.Header.Add("Content-Type", "application/json")
+// 	return resp, nil
+// }
