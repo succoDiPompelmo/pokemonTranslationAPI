@@ -111,7 +111,7 @@ func TestPokemonSpeciesGetDescription(t *testing.T) {
 			FlavorTextEntry{Flavor_text: "A", Language: LanguageResource{Name: "jp"}},
 		}}, want: ""},
 		"Empty Description": {input: &PokemonSpecies{Flavor_text_entries: []FlavorTextEntry{
-			FlavorTextEntry{Flavor_text: "", Language: LanguageResource{Name: "jp"}},
+			FlavorTextEntry{Flavor_text: "", Language: LanguageResource{Name: "en"}},
 		}}, want: ""},
 		"No Descriptions": {input: &PokemonSpecies{}, want: ""},
     }
