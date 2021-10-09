@@ -12,15 +12,15 @@ import (
 )
 
 type PokemonResponse struct {
-	name string
-	description string
-	is_legendary bool
-	habitat string
+	Name string
+	Description string
+	Is_legendary bool
+	Habitat string
 }
 
 type wantResponse struct {
-	statusCode int
-	pokemon PokemonResponse
+	StatusCode int
+	Pokemon PokemonResponse
 }
 
 func TestPokemonBasicRoute(t *testing.T) {
@@ -37,30 +37,30 @@ func TestPokemonBasicRoute(t *testing.T) {
         want wantResponse
     }{
         "GET /pokemon with legendary pokemon": {input: "mewtwo", want: wantResponse{
-			statusCode: 200,
-			pokemon: PokemonResponse{
-				name: "mewtwo",
-				description: "",
-				is_legendary: true,
-				habitat: "rare",
+			StatusCode: 200,
+			Pokemon: PokemonResponse{
+				Name: "mewtwo",
+				Description: "",
+				Is_legendary: true,
+				Habitat: "rare",
 			},
 		}},
 		"GET /pokemon with non-legendary pokemon": {input: "diglett", want: wantResponse{
-			statusCode: 200,
-			pokemon: PokemonResponse{
-				name: "diglett",
-				description: "",
-				is_legendary: false,
-				habitat: "cave",
+			StatusCode: 200,
+			Pokemon: PokemonResponse{
+				Name: "diglett",
+				Description: "",
+				Is_legendary: false,
+				Habitat: "cave",
 			},
 		}},
 		"GET /pokemon with empty pokemon name parameter": {input: "", want: wantResponse{
-			statusCode: 404,
-			pokemon: PokemonResponse{
-				name: "",
-				description: "",
-				is_legendary: false,
-				habitat: "",
+			StatusCode: 404,
+			Pokemon: PokemonResponse{
+				Name: "",
+				Description: "",
+				Is_legendary: false,
+				Habitat: "",
 			},
 		}},
     }
@@ -80,8 +80,8 @@ func TestPokemonBasicRoute(t *testing.T) {
 
 func checkResponse(t *testing.T, resp *http.Response, wantResp wantResponse) {
 
-	if resp.StatusCode != wantResp.statusCode {
-		t.Fatalf("Expected status code %d but found %d", resp.StatusCode, wantResp.statusCode)
+	if resp.StatusCode != wantResp.StatusCode {
+		t.Fatalf("Expected status code %d but found %d", resp.StatusCode, wantResp.StatusCode)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -92,7 +92,7 @@ func checkResponse(t *testing.T, resp *http.Response, wantResp wantResponse) {
 	var gotPokemon PokemonResponse
 	json.Unmarshal(body, &gotPokemon)
 
-	diff := cmp.Diff(wantResp.pokemon, gotPokemon)
+	diff := cmp.Diff(wantResp.Pokemon, gotPokemon)
 	if diff != "" {
 		t.Fatalf(diff)
 	}
