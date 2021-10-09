@@ -2,19 +2,20 @@ package main
 
 import (
 	"testing"
+	"github.com/go-resty/resty/v2"
 )
 
 func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
-	appCtx := &AppCtx{}
+	appCtx := &AppCtx{
+		client: resty.New(),
+	}
 	pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, "mewtwo")
-	
 	if err != nil {
 		t.Errorf("Expected no Errors but found: %s", err.Error())
 	}
 
 	if pokemonSpeciesData == nil {
-		t.Errorf("Expected pokemon data but none found")
-		return 
+		t.Fatalf("Expected pokemon data but none found") 
 	}
 
 	if pokemonSpeciesData.Name != "mewtwo" {
@@ -31,7 +32,9 @@ func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
 }
 
 func TestGetPokemonSpeciesDataInvalidPokemon(t *testing.T) {
-	appCtx := &AppCtx{}
+	appCtx := &AppCtx{
+		client: resty.New(),
+	}
 	pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, "paolo")
 
 	if pokemonSpeciesData != nil {

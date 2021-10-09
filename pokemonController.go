@@ -1,7 +1,7 @@
 package main
 
 import (
-
+	"fmt"
 )
 
 type PokemonSpecies struct {
@@ -26,5 +26,12 @@ type LanguageResource struct {
 }
 
 func getPokemonSpeciesData(appCtx *AppCtx, pokemonName string) (*PokemonSpecies, error) {
-    return nil, nil
+	resp, err := appCtx.client.R().SetResult(&PokemonSpecies{}).Get("https://pokeapi.co/api/v2/pokemon-species" + "/" + pokemonName)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode() != 200 {
+		return nil, fmt.Errorf("The Poke API Request returned a status code %d", resp.StatusCode())
+	}
+    return resp.Result().(*PokemonSpecies), err
 }
