@@ -23,7 +23,7 @@ func getTranslatedDescription(appCtx AppCtx, description string, habitat string,
 		return description, err
 	}
 	if resp.StatusCode() > 399 {
-		return description, &RequestError{statusCode: resp.StatusCode(), err: err,}
+		return description, &RequestError{StatusCode: resp.StatusCode(), Err: err,}
 	}
 
     return resp.Result().(*TranslationResponse).Contents.Translated, err

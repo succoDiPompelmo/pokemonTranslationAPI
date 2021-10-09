@@ -30,7 +30,7 @@ func getPokemonSpeciesData(appCtx AppCtx, pokemonName string) (*PokemonSpecies, 
 		return nil, err
 	}
 	if resp.StatusCode() > 399 {
-		return nil, &RequestError{statusCode: resp.StatusCode(), err: err,}
+		return nil, &RequestError{StatusCode: resp.StatusCode(), Err: err,}
 	}
     return resp.Result().(*PokemonSpecies), err
 }
