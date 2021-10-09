@@ -22,7 +22,6 @@ type FlavorTextEntry struct {
 
 type LanguageResource struct {
 	Name string
-	Url string
 }
 
 func getPokemonSpeciesData(appCtx *AppCtx, pokemonName string) (*PokemonSpecies, error) {
