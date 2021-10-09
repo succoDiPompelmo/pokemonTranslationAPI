@@ -35,3 +35,15 @@ func getPokemonSpeciesData(appCtx *AppCtx, pokemonName string) (*PokemonSpecies,
 	}
     return resp.Result().(*PokemonSpecies), err
 }
+
+func (pokemonSpecies PokemonSpecies) getDescription() string {
+	return ""
+}
+
+func (pokemonSpecies PokemonSpecies) getHabitat() string {
+	return ""
+}
+
+func (pokemonSpecies PokemonSpecies) isLegendary() bool {
+	return false
+}
