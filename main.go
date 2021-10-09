@@ -8,6 +8,8 @@ import (
 type AppCtx struct {
 	app *fiber.App
 	client *resty.Client
+	pokemonApiURL string
+	translationApiURL string
 }
 
 func main() {
