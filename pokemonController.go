@@ -32,7 +32,7 @@ func getPokemonSpeciesData(appCtx AppCtx, pokemonName string) (*PokemonSpecies, 
 		return nil, err
 	}
 	if resp.StatusCode() > 399 {
-		log.Printf("GET POKEMON SPECIES ERROR: %s for pokemon %s and obtained status code %d and response %s", err.Error(), pokemonName, resp.StatusCode(), string(resp.Body()))
+		log.Printf("GET POKEMON SPECIES ERROR: for pokemon %s and obtained status code %d and response %s", pokemonName, resp.StatusCode(), string(resp.Body()))
 		return nil, &RequestError{StatusCode: resp.StatusCode(), Err: err,}
 	}
     return resp.Result().(*PokemonSpecies), err

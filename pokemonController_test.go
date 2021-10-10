@@ -6,7 +6,6 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/google/go-cmp/cmp"
 	"time"
-	"strings"
 )
 
 func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
@@ -119,9 +118,6 @@ func TestGetPokemonSpeciesDataTimeout(t *testing.T) {
 			_, ok := err.(*RequestError)
 			if ok {
 				t.Fatalf("Expected error but got request error instead")
-			}
-			if !strings.Contains(err.Error(), "Client.Timeout exceeded while awaiting headers") {
-				t.Fatalf(err.Error())
 			}
         })
     }
