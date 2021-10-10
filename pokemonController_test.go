@@ -8,27 +8,13 @@ import (
 )
 
 func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
-	
+
 	restyClient := resty.New()
-	appCtx := AppCtx{
-		client: restyClient,
-		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
-	}
+	appCtx := initAppCtx(restyClient)
 
 	httpmock.ActivateNonDefault(restyClient.GetClient())
   	defer httpmock.DeactivateAndReset()
-
-	httpmock.RegisterResponder(
-		"GET", 
-		"https://pokeapi.co/api/v2/pokemon-species/mewtwo", 
-		legendaryPokemonResponder,
-	)
-
-	httpmock.RegisterResponder(
-		"GET", 
-		"https://pokeapi.co/api/v2/pokemon-species/diglett", 
-		cavePokemonResponder,
-	)
+	initPokemonResponder(appCtx)
 
 	tests := map[string]struct {
         input string
@@ -67,26 +53,13 @@ func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
 }
 
 func TestGetPokemonSpeciesDataInvalidPokemon(t *testing.T) {
+
 	restyClient := resty.New()
-	appCtx := AppCtx{
-		client: restyClient,
-		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
-	}
+	appCtx := initAppCtx(restyClient)
 
 	httpmock.ActivateNonDefault(restyClient.GetClient())
   	defer httpmock.DeactivateAndReset()
-
-	httpmock.RegisterResponder(
-		"GET", 
-		"https://pokeapi.co/api/v2/pokemon-species/zxcvb", 
-		invalidPokemonResponder,
-	)
-
-	httpmock.RegisterResponder(
-		"GET", 
-		"https://pokeapi.co/api/v2/pokemon-species/internalServerError", 
-		internalServerError,
-	)
+	initPokemonResponder(appCtx)
 
 	tests := map[string]struct {
         input string

@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-	"github.com/gofiber/fiber/v2"
 	"github.com/go-resty/resty/v2"
 	"net/http/httptest"
 	"net/http"
@@ -27,21 +26,13 @@ type wantResponse struct {
 func TestPokemonBasicRoute(t *testing.T) {
 
 	restyClient := resty.New()
-	appCtx := AppCtx{
-		app: fiber.New(),
-		client: restyClient,
-		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
-	}
+	appCtx := initAppCtx(restyClient)
+	pokemonRoutes(appCtx)
 
 	httpmock.ActivateNonDefault(restyClient.GetClient())
   	defer httpmock.DeactivateAndReset()
-
-	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/mewtwo", legendaryPokemonResponder)
-	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/diglett", cavePokemonResponder)
-	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/zxcvb", invalidPokemonResponder)
-
-	pokemonRoutes(appCtx)
-
+	initPokemonResponder(appCtx)
+	
 	tests := map[string]struct {
         input string
         want wantResponse
@@ -100,29 +91,13 @@ func TestPokemonBasicRoute(t *testing.T) {
 func TestPokemonTraslationRoute(t *testing.T) {
 
 	restyClient := resty.New()
-	appCtx := AppCtx{
-		app: fiber.New(),
-		client: restyClient,
-		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
-	}
+	appCtx := initAppCtx(restyClient)
+	pokemonRoutes(appCtx)
 
 	httpmock.ActivateNonDefault(restyClient.GetClient())
   	defer httpmock.DeactivateAndReset()
-
-	pokemonRoutes(appCtx)
-
-	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/mewtwo", legendaryPokemonResponder)
-	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/diglett", cavePokemonResponder)
-	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/zxcvb", invalidPokemonResponder)
-	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/oddish", nonCaveNonLegendaryPokemonResponder)
-	httpmock.RegisterResponder("GET", 
-		"https://api.funtranslations.com/translate/yoda.json?text=How%20are%20you%20doing%20young%20man", 
-		yodaResponder,
-	)
-	httpmock.RegisterResponder("GET", 
-		"https://api.funtranslations.com/translate/shakespeare.json?text=How%20are%20you%20doing%20young%20man", 
-		shakespeareResponder,
-	)
+	initPokemonResponder(appCtx)
+	initTranslationResponder(appCtx)
 
 	tests := map[string]struct {
         input string

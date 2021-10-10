@@ -31,7 +31,7 @@ func getTranslatedDescription(appCtx AppCtx, description string, habitat string,
 
 func getTranslationURL(appCtx AppCtx, habitat string, isLegendary bool) string {
 	if habitat == "cave" || isLegendary {
-		return "https://api.funtranslations.com/translate/yoda.json?text="
+		return appCtx.translationUrl + "yoda.json?text="
 	}
-	return "https://api.funtranslations.com/translate/shakespeare.json?text="
+	return appCtx.translationUrl + "shakespeare.json?text="
 }

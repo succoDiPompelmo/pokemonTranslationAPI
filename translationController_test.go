@@ -14,7 +14,9 @@ type TranslationInput struct {
 
 func TestGetTranslationURL(t *testing.T) {
 	
-	appCtx := AppCtx{}
+	appCtx := AppCtx{
+		translationUrl: FUN_TRANSLATION_API_URL,
+	}
 	
 	tests := map[string]struct {
         input TranslationInput
@@ -51,25 +53,11 @@ func TestGetTranslationURL(t *testing.T) {
 func TestGetTranslatedDescription(t *testing.T) {
 	
 	restyClient := resty.New()
-	appCtx := AppCtx{
-		client: restyClient,
-		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
-	}
+	appCtx := initAppCtx(restyClient)
 
 	httpmock.ActivateNonDefault(restyClient.GetClient())
   	defer httpmock.DeactivateAndReset()
-
-	httpmock.RegisterResponder(
-		"GET", 
-		"https://api.funtranslations.com/translate/yoda.json?text=How%20are%20you%20doing%20young%20man", 
-		yodaResponder,
-	)
-
-	httpmock.RegisterResponder(
-		"GET", 
-		"https://api.funtranslations.com/translate/shakespeare.json?text=How%20are%20you%20doing%20young%20man", 
-		shakespeareResponder,
-	)
+	initTranslationResponder(appCtx)
 
 	tests := map[string]struct {
         input TranslationInput

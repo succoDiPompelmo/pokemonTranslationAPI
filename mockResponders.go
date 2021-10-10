@@ -5,6 +5,24 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
+func initPokemonResponder(appCtx AppCtx) {
+
+	httpmock.RegisterResponder("GET", appCtx.pokemonApiURL + "oddish", nonCaveNonLegendaryPokemonResponder)
+	httpmock.RegisterResponder("GET", appCtx.pokemonApiURL + "zxcvb", invalidPokemonResponder)
+	httpmock.RegisterResponder("GET", appCtx.pokemonApiURL + "internalServerError", internalServerError)
+	httpmock.RegisterResponder("GET", appCtx.pokemonApiURL + "mewtwo", legendaryPokemonResponder)
+	httpmock.RegisterResponder("GET", appCtx.pokemonApiURL + "diglett", cavePokemonResponder)
+
+}
+
+func initTranslationResponder(appCtx AppCtx) {
+
+	testCaseText := "How%20are%20you%20doing%20young%20man"
+	httpmock.RegisterResponder("GET", appCtx.translationUrl + "yoda.json?text=" + testCaseText, yodaResponder)
+	httpmock.RegisterResponder("GET", appCtx.translationUrl + "shakespeare.json?text=" + testCaseText, shakespeareResponder)
+
+}
+
 func yodaResponder(req *http.Request) (*http.Response, error) {
 	resp := httpmock.NewStringResponse(200, `{"contents":{"translated": "You doing young man,  how are"}}`)
 	resp.Header.Add("Content-Type", "application/json")

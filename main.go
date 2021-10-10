@@ -9,14 +9,23 @@ type AppCtx struct {
 	app *fiber.App
 	client *resty.Client
 	pokemonApiURL string
-	translationApiURL string
+	translationUrl string
+	timeout int
 }
 
 func main() {
-	appCtx := AppCtx{
-		app: fiber.New(),
-		client: resty.New(),
-	}
+	
+	appCtx := initAppCtx(resty.New())
 	pokemonRoutes(appCtx)
 	appCtx.app.Listen(":3000")
+}
+
+func initAppCtx(client *resty.Client) AppCtx {
+	return AppCtx{
+		app: fiber.New(),
+		client: client,
+		pokemonApiURL: POKEMON_API_URL,
+		translationUrl: FUN_TRANSLATION_API_URL,
+		timeout: TIMEOUT,
+	}
 }
