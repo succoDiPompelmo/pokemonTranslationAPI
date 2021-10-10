@@ -36,6 +36,8 @@ Once finished you can use any HTTP client (curl, postman, etc...) that you want 
 ```bash
 curl http://localhost:3000/pokemon/mewtwo
 {"Is_legendary":true,"description":"It was created by a scientist after years of horrific gene splicing and DNA engineering experiments.","habitat":"rare","name":"mewtwo"}
+curl http://localhost:3000/pokemon/translated/diglett
+{"Is_legendary":false,"description":"On plant roots,  lives about one yard underground where it feeds.Above ground,  it sometimes appears.","habitat":"cave","name":"diglett"}
 ```
 
 ## Build from source
