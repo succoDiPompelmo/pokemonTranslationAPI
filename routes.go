@@ -2,10 +2,13 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cache"
 	"fmt"
 )
 
 func pokemonRoutes(appCtx AppCtx) {
+
+	appCtx.app.Use(cache.New())
 	
 	appCtx.app.Get("/pokemon/:pokemonName", func(c *fiber.Ctx) error {
 		pokemonName := c.Params("pokemonName")
