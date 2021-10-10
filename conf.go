@@ -1,5 +1,8 @@
 package main
 
+import (
+)
+
 const ( 
 	TIMEOUT int = 60
 	POKEMON_API_URL string = "https://pokeapi.co/api/v2/pokemon-species/"
