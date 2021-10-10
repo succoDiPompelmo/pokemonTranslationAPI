@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"fmt"
 )
 
 func pokemonRoutes(appCtx AppCtx) {
@@ -12,7 +13,7 @@ func pokemonRoutes(appCtx AppCtx) {
 
 		if err != nil {
 			requestError, ok := err.(*RequestError)
-			if ok && requestError.getErrorSatusCode() == 404{
+			if ok && requestError.getErrorSatusCode() == 404 {
 				return fiber.ErrNotFound
 			} else {
 				return fiber.ErrInternalServerError
@@ -28,7 +29,39 @@ func pokemonRoutes(appCtx AppCtx) {
 	})
 
 	appCtx.app.Get("/pokemon/translated/:pokemonName", func(c *fiber.Ctx) error {
-		return nil
+		
+		pokemonName := c.Params("pokemonName")
+		pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, pokemonName)
+
+		// Need to be changed
+		if err != nil {
+			requestError, ok := err.(*RequestError)
+			if ok && requestError.getErrorSatusCode() == 404{
+				return fiber.ErrNotFound
+			} else {
+				fmt.Println(err.Error())
+				return fiber.ErrInternalServerError
+			}
+		}
+
+		trasnlatedDescription, err := getTranslatedDescription(
+			appCtx, 
+			pokemonSpeciesData.getDescription(),
+			pokemonSpeciesData.getHabitat(),
+			pokemonSpeciesData.isLegendary(),
+		)
+
+		if err != nil {
+			fmt.Println(err.Error())
+			return fiber.ErrInternalServerError
+		}
+
+		return c.JSON(fiber.Map{
+			"name": pokemonName,
+			"description": trasnlatedDescription,
+			"habitat": pokemonSpeciesData.getHabitat(),
+			"Is_legendary": pokemonSpeciesData.isLegendary(),
+		})
 	})
 
 }

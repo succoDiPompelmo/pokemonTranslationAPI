@@ -137,7 +137,7 @@ func TestPokemonTraslationRoute(t *testing.T) {
 				Habitat: "rare",
 			},
 		}},
-		"GET /pokemon/translated with non-legendary pokemon": {input: "diglett", want: wantResponse{
+		"GET /pokemon/translated with cave pokemon": {input: "diglett", want: wantResponse{
 			StatusCode: 200,
 			Pokemon: PokemonResponse{
 				Name: "diglett",
@@ -147,12 +147,12 @@ func TestPokemonTraslationRoute(t *testing.T) {
 			},
 		}},
 		"GET /pokemon/translated with non-legendary non-cave pokemon": {input: "oddish", want: wantResponse{
-			StatusCode: 404,
+			StatusCode: 200,
 			Pokemon: PokemonResponse{
-				Name: "",
+				Name: "oddish",
 				Description: "How art thee doing young sir",
 				Is_legendary: false,
-				Habitat: "",
+				Habitat: "forest",
 			},
 		}},
 		"GET /pokemon/translated with non-existing pokemon": {input: "zxcvb", want: wantResponse{
@@ -165,7 +165,7 @@ func TestPokemonTraslationRoute(t *testing.T) {
 			},
 		}},
 		"GET /pokemon/translated with empty pokemon name parameter": {input: "", want: wantResponse{
-			StatusCode: 404,
+			StatusCode: 500,
 			Pokemon: PokemonResponse{
 				Name: "",
 				Description: "",
