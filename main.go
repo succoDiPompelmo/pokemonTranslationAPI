@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/go-resty/resty/v2"
+	"fmt"
 )
 
 type AppCtx struct {
@@ -17,7 +18,18 @@ func main() {
 	
 	appCtx := initAppCtx(resty.New())
 	pokemonRoutes(appCtx)
-	appCtx.app.Listen(":3000")
+	
+	var err error
+
+	if HTTPS {
+		err = appCtx.app.ListenTLS(":3000", "./auth/example.pem", "./auth/example.key")
+	} else {
+		err = appCtx.app.Listen(":3000")
+	}
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }
 
 func initAppCtx(client *resty.Client) AppCtx {
