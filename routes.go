@@ -36,7 +36,6 @@ func pokemonRoutes(appCtx AppCtx) {
 		pokemonName := c.Params("pokemonName")
 		pokemonSpeciesData, err := getPokemonSpeciesData(appCtx, pokemonName)
 
-		// Need to be changed
 		if err != nil {
 			requestError, ok := err.(*RequestError)
 			if ok && requestError.getErrorSatusCode() == 404{
@@ -55,7 +54,6 @@ func pokemonRoutes(appCtx AppCtx) {
 		)
 
 		if err != nil {
-			fmt.Println(err.Error())
 			return fiber.ErrInternalServerError
 		}
 

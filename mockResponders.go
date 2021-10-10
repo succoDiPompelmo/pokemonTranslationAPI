@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"github.com/jarcoal/httpmock"
+	"time"
 )
 
 func initPokemonResponder(appCtx AppCtx) {
@@ -69,6 +70,11 @@ func internalServerError(req *http.Request) (*http.Response, error) {
 	resp := httpmock.NewStringResponse(500, "")
 	resp.Header.Add("Content-Type", "application/json")
 	return resp, nil
+}
+
+func timeoutResponder(req *http.Request) (*http.Response, error) {
+	time.Sleep(10 * time.Second)
+	return nil, nil
 }
 
 // func f(req *http.Request) (*http.Response, error) {

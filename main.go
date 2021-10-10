@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/go-resty/resty/v2"
 	"fmt"
+	"time"
 )
 
 type AppCtx struct {
@@ -11,12 +12,11 @@ type AppCtx struct {
 	client *resty.Client
 	pokemonApiURL string
 	translationUrl string
-	timeout int
 }
 
 func main() {
 	
-	appCtx := initAppCtx(resty.New())
+	appCtx := initAppCtx(initRestyClient())
 	pokemonRoutes(appCtx)
 	
 	var err error
@@ -38,6 +38,11 @@ func initAppCtx(client *resty.Client) AppCtx {
 		client: client,
 		pokemonApiURL: POKEMON_API_URL,
 		translationUrl: FUN_TRANSLATION_API_URL,
-		timeout: TIMEOUT,
 	}
+}
+
+func initRestyClient() *resty.Client {
+	restyClient := resty.New()
+	restyClient.SetTimeout(TIMEOUT * time.Second)
+	return restyClient
 }

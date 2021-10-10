@@ -5,6 +5,8 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/go-resty/resty/v2"
 	"github.com/google/go-cmp/cmp"
+	"time"
+	"strings"
 )
 
 func TestGetPokemonSpeciesDataValidPokemon(t *testing.T) {
@@ -84,6 +86,42 @@ func TestGetPokemonSpeciesDataInvalidPokemon(t *testing.T) {
 			diff := cmp.Diff(tc.want, err)
 			if diff != "" {
 				t.Fatalf(diff)
+			}
+        })
+    }
+}
+
+func TestGetPokemonSpeciesDataTimeout(t *testing.T) {
+
+	restyClient := resty.New()
+	restyClient.SetTimeout(1 * time.Second)
+	appCtx := initAppCtx(restyClient)
+
+	httpmock.ActivateNonDefault(restyClient.GetClient())
+  	defer httpmock.DeactivateAndReset()
+	  httpmock.RegisterResponder("GET", appCtx.pokemonApiURL + "oddish", timeoutResponder)
+
+	tests := map[string]struct {
+        input string
+        want string
+    }{
+        "Get pokemon species data with timeout": {
+			input: "oddish", 
+			want: "Client.Timeout exceeded while awaiting headers"},
+	}
+
+	for name, tc := range tests {
+        t.Run(name, func(t *testing.T) {
+			got, err := getPokemonSpeciesData(appCtx, tc.input)
+			if got != nil {
+				t.Fatalf("Expected error but got pokemon data")
+			}
+			_, ok := err.(*RequestError)
+			if ok {
+				t.Fatalf("Expected error but got request error instead")
+			}
+			if !strings.Contains(err.Error(), "Client.Timeout exceeded while awaiting headers") {
+				t.Fatalf(err.Error())
 			}
         })
     }
