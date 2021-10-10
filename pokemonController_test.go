@@ -180,6 +180,9 @@ func TestPokemonSpeciesGetDescription(t *testing.T) {
 			FlavorTextEntry{Flavor_text: "", Language: LanguageResource{Name: "en"}},
 		}}, want: ""},
 		"No Descriptions": {input: &PokemonSpecies{}, want: ""},
+		"Description with escaped sequences": {input: &PokemonSpecies{Flavor_text_entries: []FlavorTextEntry{
+			FlavorTextEntry{Flavor_text: "A\nB\f\n\fC", Language: LanguageResource{Name: "en"}},
+		}}, want: "A B   C"},
     }
 
 	for name, tc := range tests {
