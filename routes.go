@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
-	"fmt"
+	"log"
 )
 
 func pokemonRoutes(appCtx AppCtx) {
@@ -17,8 +17,10 @@ func pokemonRoutes(appCtx AppCtx) {
 		if err != nil {
 			requestError, ok := err.(*RequestError)
 			if ok && requestError.getErrorSatusCode() == 404 {
+				log.Printf("GET POKEMON ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
 				return fiber.ErrNotFound
 			} else {
+				log.Printf("GET POKEMON ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
 				return fiber.ErrInternalServerError
 			}
 		}
@@ -39,9 +41,10 @@ func pokemonRoutes(appCtx AppCtx) {
 		if err != nil {
 			requestError, ok := err.(*RequestError)
 			if ok && requestError.getErrorSatusCode() == 404{
+				log.Printf("GET POKEMON ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
 				return fiber.ErrNotFound
 			} else {
-				fmt.Println(err.Error())
+				log.Printf("GET POKEMON ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
 				return fiber.ErrInternalServerError
 			}
 		}

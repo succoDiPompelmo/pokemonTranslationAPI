@@ -2,6 +2,7 @@ package main
 
 import (
 	"strings"
+	"log"
 )
 
 type PokemonSpecies struct {
@@ -27,9 +28,11 @@ type LanguageResource struct {
 func getPokemonSpeciesData(appCtx AppCtx, pokemonName string) (*PokemonSpecies, error) {
 	resp, err := appCtx.client.R().SetResult(&PokemonSpecies{}).Get(appCtx.pokemonApiURL + pokemonName)
 	if err != nil {
+		log.Printf("GET POKEMON SPECIES ERROR: %s for pokemon %s and obtained response %s", err.Error(), pokemonName, string(resp.Body()))
 		return nil, err
 	}
 	if resp.StatusCode() > 399 {
+		log.Printf("GET POKEMON SPECIES ERROR: %s for pokemon %s and obtained status code %d and response %s", err.Error(), pokemonName, resp.StatusCode(), string(resp.Body()))
 		return nil, &RequestError{StatusCode: resp.StatusCode(), Err: err,}
 	}
     return resp.Result().(*PokemonSpecies), err

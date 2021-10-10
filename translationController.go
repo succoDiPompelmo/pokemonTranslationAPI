@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/url"
+	"log"
 )
 
 type TranslationResponse struct {
@@ -20,9 +21,11 @@ func getTranslatedDescription(appCtx AppCtx, description string, habitat string,
 		Get(translationUrl + url.PathEscape(description))
 
 	if err != nil {
+		log.Printf("GET TRANSLATED DESCRIPTION ERROR: %s for description %s and obtained response %s", err.Error(), description, string(resp.Body()))
 		return description, err
 	}
 	if resp.StatusCode() > 399 {
+		log.Printf("GET TRANSLATED DESCRIPTION ERRO: %s for description %s and returned status code %d with response %s", err.Error(), description, resp.StatusCode(), string(resp.Body()))
 		return description, &RequestError{StatusCode: resp.StatusCode(), Err: err,}
 	}
 

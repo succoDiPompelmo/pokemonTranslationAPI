@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/go-resty/resty/v2"
-	"fmt"
 	"time"
+	"log"
 )
 
 type AppCtx struct {
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Printf("ERROR in initializing the app, the following message is returned %s", err.Error())
 	}
 }
 
