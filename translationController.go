@@ -3,6 +3,7 @@ package main
 import (
 	"net/url"
 	"log"
+	"encoding/json"
 )
 
 type TranslationResponse struct {
@@ -16,20 +17,20 @@ type ContentsResource struct {
 func getTranslatedDescription(appCtx AppCtx, description string, habitat string, isLegendary bool) (string, error) {
 
 	translationUrl := getTranslationURL(appCtx, habitat, isLegendary)
-	resp, err := appCtx.client.R().
-		SetResult(&TranslationResponse{}).
-		Get(translationUrl + url.PathEscape(description))
+	resp, err := doGet(appCtx, translationUrl + url.PathEscape(description))
 
 	if err != nil {
-		log.Printf("GET TRANSLATED DESCRIPTION ERROR: %s for description %s and obtained response %s", err.Error(), description, string(resp.Body()))
+		log.Printf("GET TRANSLATED DESCRIPTION ERROR: %s for description %s and obtained response %s", err.Error(), description, string(resp.responseBody))
 		return description, err
 	}
-	if resp.StatusCode() > 399 {
-		log.Printf("GET TRANSLATED DESCRIPTION ERRO: for description %s and returned status code %d with response %s", description, resp.StatusCode(), string(resp.Body()))
-		return description, &RequestError{StatusCode: resp.StatusCode(), Err: err,}
+	if resp.statusCode > 399 {
+		log.Printf("GET TRANSLATED DESCRIPTION ERRO: for description %s and returned status code %d with response %s", description, resp.statusCode, string(resp.responseBody))
+		return description, &RequestError{StatusCode: resp.statusCode, Err: err,}
 	}
 
-    return resp.Result().(*TranslationResponse).Contents.Translated, err
+	var result TranslationResponse
+	json.Unmarshal(resp.responseBody, &result)
+    return result.Contents.Translated, err
 }
 
 func getTranslationURL(appCtx AppCtx, habitat string, isLegendary bool) string {

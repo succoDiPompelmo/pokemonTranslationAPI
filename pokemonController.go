@@ -3,6 +3,7 @@ package main
 import (
 	"strings"
 	"log"
+	"encoding/json"
 )
 
 type PokemonSpecies struct {
@@ -26,16 +27,19 @@ type LanguageResource struct {
 }
 
 func getPokemonSpeciesData(appCtx AppCtx, pokemonName string) (*PokemonSpecies, error) {
-	resp, err := appCtx.client.R().SetResult(&PokemonSpecies{}).Get(appCtx.pokemonApiURL + pokemonName)
+	resp, err := doGet(appCtx, appCtx.pokemonApiURL + pokemonName)
 	if err != nil {
-		log.Printf("GET POKEMON SPECIES ERROR: %s for pokemon %s and obtained response %s", err.Error(), pokemonName, string(resp.Body()))
+		log.Printf("GET POKEMON SPECIES ERROR: %s for pokemon %s and obtained response %s", err.Error(), pokemonName, string(resp.responseBody))
 		return nil, err
 	}
-	if resp.StatusCode() > 399 {
-		log.Printf("GET POKEMON SPECIES ERROR: for pokemon %s and obtained status code %d and response %s", pokemonName, resp.StatusCode(), string(resp.Body()))
-		return nil, &RequestError{StatusCode: resp.StatusCode(), Err: err,}
+	if resp.statusCode > 399 {
+		log.Printf("GET POKEMON SPECIES ERROR: for pokemon %s and obtained status code %d and response %s", pokemonName, resp.statusCode, string(resp.responseBody))
+		return nil, &RequestError{StatusCode: resp.statusCode, Err: err,}
 	}
-    return resp.Result().(*PokemonSpecies), err
+
+	var result PokemonSpecies
+	json.Unmarshal(resp.responseBody, &result)
+    return &result, err
 }
 
 func (pokemonSpecies PokemonSpecies) getDescription() string {
