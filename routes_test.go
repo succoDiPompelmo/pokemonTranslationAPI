@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/jarcoal/httpmock"
 )
 
 type PokemonResponse struct {
@@ -26,10 +26,19 @@ type wantResponse struct {
 
 func TestPokemonBasicRoute(t *testing.T) {
 
+	restyClient := resty.New()
 	appCtx := AppCtx{
 		app: fiber.New(),
-		client: resty.New(),
+		client: restyClient,
+		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
 	}
+
+	httpmock.ActivateNonDefault(restyClient.GetClient())
+  	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/mewtwo", legendaryPokemonResponder)
+	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/diglett", cavePokemonResponder)
+	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/zxcvb", invalidPokemonResponder)
 
 	pokemonRoutes(appCtx)
 
@@ -41,7 +50,7 @@ func TestPokemonBasicRoute(t *testing.T) {
 			StatusCode: 200,
 			Pokemon: PokemonResponse{
 				Name: "mewtwo",
-				Description: "",
+				Description: "How are you doing young man",
 				Is_legendary: true,
 				Habitat: "rare",
 			},
@@ -50,12 +59,12 @@ func TestPokemonBasicRoute(t *testing.T) {
 			StatusCode: 200,
 			Pokemon: PokemonResponse{
 				Name: "diglett",
-				Description: "",
+				Description: "How are you doing young man",
 				Is_legendary: false,
 				Habitat: "cave",
 			},
 		}},
-		"GET /pokemon with non-existing pokemon": {input: "zxcvbnm", want: wantResponse{
+		"GET /pokemon with non-existing pokemon": {input: "zxcvb", want: wantResponse{
 			StatusCode: 404,
 			Pokemon: PokemonResponse{
 				Name: "",
@@ -88,6 +97,97 @@ func TestPokemonBasicRoute(t *testing.T) {
     }
 }
 
+func TestPokemonTraslationRoute(t *testing.T) {
+
+	restyClient := resty.New()
+	appCtx := AppCtx{
+		app: fiber.New(),
+		client: restyClient,
+		pokemonApiURL: "https://pokeapi.co/api/v2/pokemon-species",
+	}
+
+	httpmock.ActivateNonDefault(restyClient.GetClient())
+  	defer httpmock.DeactivateAndReset()
+
+	pokemonRoutes(appCtx)
+
+	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/mewtwo", legendaryPokemonResponder)
+	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/diglett", cavePokemonResponder)
+	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/zxcvb", invalidPokemonResponder)
+	httpmock.RegisterResponder("GET", "https://pokeapi.co/api/v2/pokemon-species/oddish", nonCaveNonLegendaryPokemonResponder)
+	httpmock.RegisterResponder("GET", 
+		"https://api.funtranslations.com/translate/yoda.json?text=How%20are%20you%20doing%20young%20man", 
+		yodaResponder,
+	)
+	httpmock.RegisterResponder("GET", 
+		"https://api.funtranslations.com/translate/shakespeare.json?text=How%20are%20you%20doing%20young%20man", 
+		shakespeareResponder,
+	)
+
+	tests := map[string]struct {
+        input string
+        want wantResponse
+    }{
+        "GET /pokemon/translated with legendary pokemon": {input: "mewtwo", want: wantResponse{
+			StatusCode: 200,
+			Pokemon: PokemonResponse{
+				Name: "mewtwo",
+				Description: "You doing young man,  how are",
+				Is_legendary: true,
+				Habitat: "rare",
+			},
+		}},
+		"GET /pokemon/translated with non-legendary pokemon": {input: "diglett", want: wantResponse{
+			StatusCode: 200,
+			Pokemon: PokemonResponse{
+				Name: "diglett",
+				Description: "You doing young man,  how are",
+				Is_legendary: false,
+				Habitat: "cave",
+			},
+		}},
+		"GET /pokemon/translated with non-legendary non-cave pokemon": {input: "oddish", want: wantResponse{
+			StatusCode: 404,
+			Pokemon: PokemonResponse{
+				Name: "",
+				Description: "How art thee doing young sir",
+				Is_legendary: false,
+				Habitat: "",
+			},
+		}},
+		"GET /pokemon/translated with non-existing pokemon": {input: "zxcvb", want: wantResponse{
+			StatusCode: 404,
+			Pokemon: PokemonResponse{
+				Name: "",
+				Description: "",
+				Is_legendary: false,
+				Habitat: "",
+			},
+		}},
+		"GET /pokemon/translated with empty pokemon name parameter": {input: "", want: wantResponse{
+			StatusCode: 404,
+			Pokemon: PokemonResponse{
+				Name: "",
+				Description: "",
+				Is_legendary: false,
+				Habitat: "",
+			},
+		}},
+    }
+
+	for name, tc := range tests {
+        t.Run(name, func(t *testing.T) {
+			req := httptest.NewRequest("GET", "/pokemon/translated/" + tc.input, nil)
+			resp, err := appCtx.app.Test(req, 60000) // Set Timeout
+
+			if err != nil {
+				t.Fatalf("Error executing the request: %s", err.Error())
+			}
+			checkResponse(t, resp, tc.want)
+        })
+    }
+}
+
 func checkResponse(t *testing.T, resp *http.Response, wantResp wantResponse) {
 
 	if resp.StatusCode != wantResp.StatusCode {
@@ -102,10 +202,7 @@ func checkResponse(t *testing.T, resp *http.Response, wantResp wantResponse) {
 	var gotPokemon PokemonResponse
 	json.Unmarshal(body, &gotPokemon)
 
-	opts := []cmp.Option{
-		cmpopts.IgnoreFields(PokemonResponse{}, "Description"),
-	}
-	diff := cmp.Diff(wantResp.Pokemon, gotPokemon, opts...)
+	diff := cmp.Diff(wantResp.Pokemon, gotPokemon)
 	if diff != "" {
 		t.Fatalf(diff)
 	}

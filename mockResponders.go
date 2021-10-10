@@ -35,6 +35,12 @@ func cavePokemonResponder(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
+func nonCaveNonLegendaryPokemonResponder(req *http.Request) (*http.Response, error) {
+	resp := httpmock.NewStringResponse(200, nonLegendaryNonCavePokemonData)
+	resp.Header.Add("Content-Type", "application/json")
+	return resp, nil
+}
+
 func invalidPokemonResponder(req *http.Request) (*http.Response, error) {
 	resp := httpmock.NewStringResponse(404, "Not Found")
 	resp.Header.Add("Content-Type", "application/json")
