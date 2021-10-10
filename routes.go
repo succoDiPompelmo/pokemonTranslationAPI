@@ -40,11 +40,11 @@ func pokemonRoutes(appCtx AppCtx) {
 
 		if err != nil {
 			requestError, ok := err.(*RequestError)
-			if ok && requestError.getErrorSatusCode() == 404{
-				log.Printf("GET POKEMON ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
+			if ok && requestError.getErrorSatusCode() == 404 {
+				log.Printf("GET POKEMON TRANSLATION ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
 				return fiber.ErrNotFound
 			} else {
-				log.Printf("GET POKEMON ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
+				log.Printf("GET POKEMON TRANSLATION ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
 				return fiber.ErrInternalServerError
 			}
 		}
@@ -57,7 +57,7 @@ func pokemonRoutes(appCtx AppCtx) {
 		)
 
 		if err != nil {
-			return fiber.ErrInternalServerError
+			log.Printf("GET POKEMON TRANSLATION ERROR with the following description %s and pokemon name %s", err.Error(), pokemonName)
 		}
 
 		return c.JSON(fiber.Map{
