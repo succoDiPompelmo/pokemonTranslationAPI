@@ -12,7 +12,7 @@ The second endpoint return the same set of attributes ot the previous one but wi
 
 ## Docker
 
-The easy way to get started with this project is to use Docker. I tested this with the Docker Engine 19.03.1 on Mac OS. First of all download the git repository.
+The easy way to get started with this project is to use Docker. I tested this with the Docker Engine 19.03.1 on Mac OS. To install Docker look at https://docs.docker.com/engine/install/. First of all download the git repository.
 
 ```bash
 git clone https://github.com/succoDiPompelmo/pokemonTranslationAPI
